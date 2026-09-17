@@ -35,6 +35,8 @@ python main.py
 
 The `web/` directory contains a no-install browser edition of the restaurant-allocation simulator. It is built with plain HTML, CSS, and JavaScript and is ready for Vercel deployment. It provides interactive group arrivals, selectable allocation policies, a live dining-floor view, and service metrics.
 
+**Live demo:** https://restaurant-alloc-web.vercel.app
+
 The original `main.py` Pygame application remains the full desktop version.
 
 ## Generated files

@@ -1,0 +1,20 @@
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+assets/agent/.venv/
+
+# Generated application output
+reports/*.pdf
+saves/*.json
+saves/*.pkl
+
+# OS and editor files
+.DS_Store
+.vscode/
+
+# Vercel's local project settings
+.vercel/

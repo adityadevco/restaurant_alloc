@@ -91,7 +91,10 @@ WINDOW_HEIGHT = int(
 # CREATE WINDOW
 # ============================================================
 
-screen = pygame.display.set_mode(
+# Keep the native window separate from the fixed-size game canvas. Every
+# component is designed around a 1450 x 875 coordinate system; drawing
+# directly to a smaller resizable window clipped the right and bottom edges.
+window = pygame.display.set_mode(
     (
         WINDOW_WIDTH,
         WINDOW_HEIGHT
@@ -117,6 +120,10 @@ game_surface = pygame.Surface(
     )
 )
 
+# Existing components receive ``screen`` and continue to draw at the original
+# design resolution. The canvas is scaled into ``window`` once per frame.
+screen = game_surface
+
 
 clock = pygame.time.Clock()
 
@@ -134,6 +141,71 @@ BACKGROUND = (
     20,
     25
 )
+
+
+def get_display_transform():
+    """Return the scale and letterbox offset for the current window size."""
+
+    display_surface = pygame.display.get_surface()
+
+    if display_surface is None:
+        return 1.0, 0, 0
+
+    window_width, window_height = display_surface.get_size()
+
+    scale = min(
+        window_width / DESIGN_WIDTH,
+        window_height / DESIGN_HEIGHT
+    )
+
+    scaled_width = int(DESIGN_WIDTH * scale)
+    scaled_height = int(DESIGN_HEIGHT * scale)
+
+    offset_x = (window_width - scaled_width) // 2
+    offset_y = (window_height - scaled_height) // 2
+
+    return scale, offset_x, offset_y
+
+
+def map_event_to_game_surface(event):
+    """Map mouse input from the scaled window back to game coordinates."""
+
+    if not hasattr(event, "pos"):
+        return event
+
+    scale, offset_x, offset_y = get_display_transform()
+
+    if scale <= 0:
+        return event
+
+    mapped_event_data = dict(event.dict)
+    mapped_event_data["pos"] = (
+        (event.pos[0] - offset_x) / scale,
+        (event.pos[1] - offset_y) / scale
+    )
+
+    return pygame.event.Event(event.type, mapped_event_data)
+
+
+# Some UI components read the mouse position directly for hover states and
+# scrolling. Give them the same logical coordinates as the mapped events.
+raw_mouse_get_pos = pygame.mouse.get_pos
+
+
+def get_game_mouse_position():
+    mouse_x, mouse_y = raw_mouse_get_pos()
+    scale, offset_x, offset_y = get_display_transform()
+
+    if scale <= 0:
+        return mouse_x, mouse_y
+
+    return (
+        (mouse_x - offset_x) / scale,
+        (mouse_y - offset_y) / scale
+    )
+
+
+pygame.mouse.get_pos = get_game_mouse_position
 
 
 # ============================================================
@@ -1757,13 +1829,17 @@ while running:
             running = False
 
 
+        # Buttons and inputs use fixed design coordinates, so mouse positions
+        # must be translated after the canvas is fitted to screen.
+        game_event = map_event_to_game_surface(event)
+
         sidebar.handle_event(
-            event
+            game_event
         )
 
 
         waiting_input.handle_event(
-            event
+            game_event
         )
 
 
@@ -3121,6 +3197,36 @@ while running:
     # --------------------------------------------------------
     # DISPLAY
     # --------------------------------------------------------
+
+    # Fit the complete design canvas inside the current window while keeping
+    # its aspect ratio. Any unused space becomes a letterbox border.
+    display_surface = pygame.display.get_surface()
+
+    if display_surface is not None:
+
+        display_surface.fill(BACKGROUND)
+
+        display_scale, display_offset_x, display_offset_y = (
+            get_display_transform()
+        )
+
+        scaled_size = (
+            max(1, int(DESIGN_WIDTH * display_scale)),
+            max(1, int(DESIGN_HEIGHT * display_scale))
+        )
+
+        scaled_game = pygame.transform.smoothscale(
+            game_surface,
+            scaled_size
+        )
+
+        display_surface.blit(
+            scaled_game,
+            (
+                display_offset_x,
+                display_offset_y
+            )
+        )
 
     pygame.display.flip()
 

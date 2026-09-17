@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c1525" />
+    <title>Metrius Eats | RL Restaurant Simulator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <div>
+          <p class="eyebrow">REINFORCEMENT LEARNING LAB</p>
+          <h1>Metrius <span>Eats</span></h1>
+          <p class="subtitle">Restaurant allocation simulator</p>
+        </div>
+        <div class="header-status"><span class="pulse"></span><span id="runState">Ready to simulate</span></div>
+      </header>
+
+      <section class="dashboard">
+        <aside class="control-panel panel">
+          <div class="panel-heading"><h2>Experiment controls</h2><span>01</span></div>
+          <label for="algorithm">Allocation policy</label>
+          <select id="algorithm">
+            <option>Q-Learning</option>
+            <option>Expected SARSA</option>
+            <option>Actor-Critic</option>
+            <option>DQN</option>
+            <option>N-Step Tree Backup</option>
+            <option>Best Fit (baseline)</option>
+          </select>
+          <p id="algorithmNote" class="hint">Balances exploration with the best known table allocation.</p>
+
+          <label for="groupSize">Add a customer group</label>
+          <div class="add-group">
+            <input id="groupSize" type="number" min="1" max="6" value="2" aria-label="Group size" />
+            <button id="addGroup" class="secondary">Add group</button>
+          </div>
+          <div class="quick-add" aria-label="Quick add customer group">
+            <button data-size="1">1</button><button data-size="2">2</button><button data-size="3">3</button><button data-size="4">4</button><button data-size="5">5</button><button data-size="6">6</button>
+          </div>
+
+          <div class="action-row">
+            <button id="start" class="primary">▶ Start service</button>
+            <button id="reset" class="icon-button" title="Reset simulation">↺</button>
+          </div>
+          <p class="keyboard-note">Tip: press <kbd>Space</kbd> to pause or continue.</p>
+
+          <div class="queue-heading"><span>Waiting queue</span><span id="queueCount">0 groups</span></div>
+          <div id="queue" class="queue empty">No customers waiting</div>
+        </aside>
+
+        <section class="restaurant panel">
+          <div class="panel-heading"><h2>Dining floor</h2><span id="clock">12:00 PM</span></div>
+          <div class="floor-legend"><span><i class="legend-dot available"></i>Available</span><span><i class="legend-dot occupied"></i>In service</span><span><i class="legend-dot cleaning"></i>Clearing</span></div>
+          <div id="floor" class="floor" aria-label="Restaurant floor with six tables"></div>
+          <div id="decision" class="decision"><span class="robot">✦</span><div><strong>RL agent ready</strong><p>Add a customer group, then start the service.</p></div></div>
+        </section>
+
+        <aside class="metrics-panel panel">
+          <div class="panel-heading"><h2>Live performance</h2><span>02</span></div>
+          <div class="metric-grid">
+            <article><span>Customers served</span><strong id="served">0</strong><small id="servedTrend">Awaiting first allocation</small></article>
+            <article><span>Avg. waiting time</span><strong id="waitTime">0.0m</strong><small id="waitTrend">No waiting data</small></article>
+            <article><span>Reward</span><strong id="reward">0</strong><small id="rewardTrend">Per allocation: —</small></article>
+            <article><span>Policy confidence</span><strong id="confidence">50%</strong><small id="confidenceTrend">Exploring options</small></article>
+          </div>
+          <div class="learning-card">
+            <div class="card-top"><span>Learning progress</span><strong id="episode">Episode 0</strong></div>
+            <div class="progress"><i id="progress"></i></div>
+            <p id="learningCopy">Run a service to observe allocation decisions.</p>
+          </div>
+          <div class="allocation-summary"><span>Table utilization</span><strong id="utilization">0 / 6</strong></div>
+        </aside>
+      </section>
+
+      <section class="footer-strip">
+        <span>Browser edition • no installation required</span>
+        <span>Models: Q-Learning · Expected SARSA · Actor-Critic · DQN · N-Step Tree Backup</span>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

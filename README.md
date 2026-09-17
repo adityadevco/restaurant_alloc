@@ -31,9 +31,11 @@ python main.py
 | `assets/` | Graphics used by the simulator |
 | `pdf_report.py` | Exports simulation reports |
 
-## Deployment note
+## Browser demo
 
-The current application opens a native Pygame window, so it cannot run on Vercel or in a browser without being rewritten as a web application. GitHub is suitable for sharing the source code; a working browser demo requires a web version (for example, a JavaScript/HTML canvas or a Python web-framework rewrite).
+The `web/` directory contains a no-install browser edition of the restaurant-allocation simulator. It is built with plain HTML, CSS, and JavaScript and is ready for Vercel deployment. It provides interactive group arrivals, selectable allocation policies, a live dining-floor view, and service metrics.
+
+The original `main.py` Pygame application remains the full desktop version.
 
 ## Generated files
 
